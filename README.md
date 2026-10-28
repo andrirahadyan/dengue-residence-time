@@ -1,5 +1,7 @@
 # Dengue transmission with human residence times in two clusters
 
+[![DOI](https://zenodo.org/badge/1436781892.svg)](https://doi.org/10.5281/zenodo.23724284)
+
 Code for the article *Daily Mobility Lowers the Dengue Threshold but Can Increase Infections: A Two-Cluster Residence-Time Model* (Andri Rahadyan, Universitas Indraprasta PGRI).
 
 The scripts implement a deterministic SEIR–SEI dengue model for two clusters connected by a residence-time (Lagrangian) matrix, in which infected residents reduce their travel by a factor θ. They reproduce every number, table, and figure in the article:
@@ -24,3 +26,7 @@ python model_waktu_tinggal_en.py
 ```
 
 Each script runs in about 10 seconds. Random seeds are fixed, so the results are reproducible.
+
+## How to cite
+
+The version used in the article is archived on Zenodo: https://doi.org/10.5281/zenodo.23724286. The DOI in the badge above always resolves to the latest version.
