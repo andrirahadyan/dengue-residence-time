@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/1436781892.svg)](https://doi.org/10.5281/zenodo.23724284)
 
-Code and data for the article *Daily Mobility Lowers the Dengue Threshold but Can Increase Infections: A Two-Cluster Residence-Time Model* (Andri Rahadyan, La Ode Sabran, Norma Muhtar, Ilham Dangu Rianjaya, Septian Wulandari).
+Code and data for the article *Daily Mobility Can Lower the Dengue Reproduction Number yet Increase Infections: A Two-Cluster Residence-Time Model Calibrated to Jakarta and Banten* (Andri Rahadyan, La Ode Sabran, Norma Muhtar, Ilham Dangu Rianjaya, Septian Wulandari).
 
 The scripts implement a deterministic SEIR–SEI dengue model for two clusters connected by a residence-time (Lagrangian) matrix, in which infected residents reduce their travel by a factor θ. They reproduce every number, table, and figure in the article:
 
