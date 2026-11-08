@@ -46,4 +46,4 @@ python calibration.py
 
 ## How to cite
 
-The version used in the article (v2.0) is archived on Zenodo: https://doi.org/10.5281/zenodo.24050287. The DOI in the badge above (https://doi.org/10.5281/zenodo.23724284) always resolves to the latest version.
+The code is archived on Zenodo: https://doi.org/10.5281/zenodo.23724284. This DOI always resolves to the latest version.
