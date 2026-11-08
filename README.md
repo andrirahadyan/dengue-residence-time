@@ -21,7 +21,7 @@ The scripts implement a deterministic SEIR–SEI dengue model for two clusters c
 |---|---|---|
 | `model_waktu_tinggal.py` | Figures with Indonesian labels and all results in `hasil_waktu_tinggal.json` | – |
 | `model_waktu_tinggal_en.py` | R0, threshold, sensitivity, and simulations with English labels, saved in `en/` | Tables 3–4, Figures 1–3 and 5 |
-| `revision_analysis.py` | Global-stability bound, endemic equilibrium, interventions; `en/results_revision.json`, `en/gambar5_interventions.png` | Section 3.3 (Theorem 3.3), Remark 1, Table 5, Figure 4 |
+| `revision_analysis.py` | Global-stability bound, endemic equilibrium, interventions; `en/results_revision.json`, `en/gambar5_interventions.png` | Section 3.3 (Theorem 3.3), Remark 3.6, Table 5, Figure 4 |
 | `endemic_reduction_check.py` | Check that every positive equilibrium of the full model equals the fixed point of the map H (θ = 0); `en/results_endemic_check.json` | Section 3.4 (Propositions 3.4–3.5) |
 | `calibration.py` | Fit to monthly cases, bootstrap, residence-time sensitivity, counterfactuals; `en/results_calibration.json`, `en/gambar6_calibration.png` | Table 6, Figure 6 |
 | `data/opendengue_v1_3_dki_banten_monthly.csv` | Monthly reported dengue cases, DKI Jakarta and Banten, 2022–2024 | Input to `calibration.py` |
