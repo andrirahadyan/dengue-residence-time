@@ -150,13 +150,13 @@ res['Jacobian'] = J
 # ------------------------------------------------------------------ 6. Gambar 1
 fig, ax = plt.subplots(1, 2, figsize=(10.5, 4.0))
 pg = np.linspace(0, 0.5, 300)
-for r, c, l in [(1, '#444444', 'Symmetric (mosquitoes 1:1)'), (2, '#c0392b', 'Mosquitoes 2:1'), (5, '#2471a3', 'Mosquitoes 5:1')]:
-    ax[0].plot(pg, [R0(make(rv=r, p12=x, theta=0)) for x in pg], color=c, lw=2, label=l + r', $\theta=0$')
-    if r > 1: ax[0].plot(pg, [R0(make(rv=r, p12=x, theta=1)) for x in pg], color=c, lw=1.6, ls='--', label=l + r', $\theta=1$')
+for r, c, l, mk in [(1, '#444444', 'Symmetric (mosquitoes 1:1)', None), (2, '#c0392b', 'Mosquitoes 2:1', 'o'), (5, '#2471a3', 'Mosquitoes 5:1', 's')]:
+    ax[0].plot(pg, [R0(make(rv=r, p12=x, theta=0)) for x in pg], color=c, lw=2, marker=mk, markevery=30, ms=5, label=l + r', $\theta=0$')
+    if r > 1: ax[0].plot(pg, [R0(make(rv=r, p12=x, theta=1)) for x in pg], color=c, lw=1.6, ls='--', marker=mk, markevery=30, ms=5, mfc='white', label=l + r', $\theta=1$')
 ax[0].axhline(1, color='k', ls=':', lw=.8)
 ax[0].set_xlabel(r'$p$ (fraction of time residents spend in the other cluster)'); ax[0].set_ylabel(r'$R_0$')
 ax[0].set_title(r'(a) $R_0$ vs $p$ (symmetric residence times)', fontsize=10); ax[0].legend(frameon=False, fontsize=8)
-cs = ax[1].contourf(g, g, Z, levels=14, cmap='RdBu_r'); cb = fig.colorbar(cs, ax=ax[1]); cb.set_label(r'$R_0$')
+cs = ax[1].contourf(g, g, Z, levels=14, cmap='cividis'); cb = fig.colorbar(cs, ax=ax[1]); cb.set_label(r'$R_0$')
 cb.ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: fk(x, 2)))
 c1 = ax[1].contour(g, g, Z, levels=[1.0], colors='k', linewidths=1.5); ax[1].clabel(c1, fmt={1.0: '$R_0=1$'}, fontsize=8)
 ax[1].plot(g, g, color='w', ls='--', lw=1); ax[1].set_xlabel(r'$p_{12}$ (cluster 1 residents in cluster 2)')
@@ -201,8 +201,10 @@ for i, pp in enumerate([0.02, 0.1, 1/3]):
                    t1=float(t[I1.argmax()]), peak2=float(I2.max()), t2=float(t[I2.argmax()]),
                    serang1=float(att(0)), serang2=float(att(1)), serang_tot=float((att(0) + att(1)) / 2),
                    cek_N=float(abs(y[:8].sum(0) - NH).max())))
+    ci = lambda k: float(np.sum(np.diff(t) * (p['beta'] * (y[2 + k][1:] + y[2 + k][:-1]) / 2)) * 1000 / p['Nh'][k])
+    T3[-1].update(cuminc1=ci(0), cuminc2=ci(1), cuminc_tot=(ci(0) + ci(1)) / 2)   # cumulative incidence, 730 days
     ax[i].plot(t, I1, color='#c0392b', lw=1.8, label=r'$I_{h1}$ (residents of the dense cluster)')
-    ax[i].plot(t, I2, color='#2471a3', lw=1.8, label=r'$I_{h2}$')
+    ax[i].plot(t, I2, color='#2471a3', lw=1.8, ls='--', label=r'$I_{h2}$')
     ax[i].set_title(r'$p=%s$, $R_0=%s$' % (fm(pp, 2) if pp != 1/3 else '1/3', fm(T3[-1]['R0'], 2)), fontsize=10)
     ax[i].set_xlabel('t (days)'); ax[i].xaxis.set_major_formatter(koma); ax[i].yaxis.set_major_formatter(koma)
     ax[i].spines['top'].set_visible(False); ax[i].spines['right'].set_visible(False)
@@ -276,7 +278,7 @@ fig, ax = plt.subplots(1, 2, figsize=(10.5, 4.2)); idx = np.argsort(abs(rp))
 ax[0].barh([labels[names[j]] for j in idx], [rp[j] for j in idx], color=['#c0392b' if rp[j] > 0 else '#2471a3' for j in idx])
 ax[0].axvline(0, color='k', lw=.8); ax[0].set_xlabel('PRCC with $R_0$'); ax[0].set_title('(a) PRCC', fontsize=10)
 idx2 = np.argsort(Si['ST']); yy = np.arange(len(names)); h = 0.38
-ax[1].barh(yy + h / 2, Si['ST'][idx2], h, color='#7f8c8d', label='$S_T$ (total)')
+ax[1].barh(yy + h / 2, Si['ST'][idx2], h, color='#d5d8dc', edgecolor='#566573', hatch='////', lw=.5, label='$S_T$ (total)')
 ax[1].barh(yy - h / 2, Si['S1'][idx2], h, color='#1e8449', label='$S_1$ (first order)')
 ax[1].set_yticks(yy); ax[1].set_yticklabels([labels[names[j]] for j in idx2]); ax[1].set_xlabel('Sobol index')
 ax[1].legend(frameon=False, loc='lower right'); ax[1].set_title('(b) Sobol indices', fontsize=10)

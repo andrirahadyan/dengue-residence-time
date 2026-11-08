@@ -137,24 +137,24 @@ pg = np.r_[0.0, 0.01, 0.02, 0.04, np.linspace(0.06, 0.5, 23)]
 sweep = {}
 for th in [0.0, 0.5, 1.0]:
     sweep[th] = [attack(make(ratio=2, rv=2, p12=x, theta=th)) for x in pg]
-rev['sweep'] = {str(th): dict(p=pg.tolist(), attack=[s['attack'] for s in v], R0=[s['R0'] for s in v])
+rev['sweep'] = {str(th): dict(p=pg.tolist(), attack=[s['cuminc'] for s in v], R0=[s['R0'] for s in v])
                 for th, v in sweep.items()}
 for th in [0.0, 0.5, 1.0]:
     a = np.array(rev['sweep'][str(th)]['attack']); i = a.argmax()
     rev['sweep'][str(th)].update(max_attack=float(a.max()), p_at_max=float(pg[i]))
 # sweep over mosquito ratio (theta = 0.5): attack at p=0.02 vs p=1/3
-rev['sweep_ratio'] = {str(r): [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['attack'] for x in [0.02, 1/3]]
+rev['sweep_ratio'] = {str(r): [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['cuminc'] for x in [0.02, 1/3]]
                       for r in [1.5, 2, 3, 5]}
 
 # Figure 5
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.0), gridspec_kw=dict(width_ratios=[1, 1.15]))
 rev['sweep_ratio_curve'] = {}
-for r, c, ls in [(1.0, '#444444', '-'), (1.5, '#2471a3', '--'), (2.0, '#c0392b', '-'), (5.0, '#7d3c98', ':')]:
-    a_ = [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['attack'] for x in pg]
+for r, c, ls, mk in [(1.0, '#444444', '-', None), (1.5, '#2471a3', '--', None), (2.0, '#c0392b', '-', 'o'), (5.0, '#7d3c98', ':', None)]:
+    a_ = [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['cuminc'] for x in pg]   # cumulative incidence, 730 days
     rev['sweep_ratio_curve'][str(r)] = a_
-    ax[0].plot(pg, a_, color=c, ls=ls, lw=2, label='mosquitoes %g:1' % r)
+    ax[0].plot(pg, a_, color=c, ls=ls, lw=2, marker=mk, markevery=3, ms=4, label='mosquitoes %g:1' % r)
 ax[0].set_xlabel(r'$p$ (fraction of time in the other cluster)')
-ax[0].set_ylabel('infected over 730 days per 1,000 residents')
+ax[0].set_ylabel('cumulative cases over 730 days per 1,000')
 ax[0].set_title(r'(a) Epidemic size vs $p$ ($N_v/N_h=2$, $\theta=0.5$)', fontsize=10)
 ax[0].legend(frameon=False)
 rows = rev['interventions']; base_att = rows[0]['cuminc']
@@ -162,7 +162,8 @@ lab = [r['name'].replace('$-30\\%$ of $N_{v1}$', '$-30\\%$ $N_{v1}$').replace('$
 val = [r['cuminc'] for r in rows][::-1]
 col = ['#7f8c8d' if i == len(rows) - 1 else ('#1e8449' if 'Vector' in rows[::-1][i]['name'] or 'Dense' in rows[::-1][i]['name'] else '#2471a3')
        for i in range(len(rows))]
-ax[1].barh(lab, val, color=col); ax[1].axvline(base_att, color='k', lw=.8, ls=':')
+hat = ['' if i == len(rows) - 1 else ('////' if c_ == '#1e8449' else '..') for i, c_ in enumerate(col)]
+ax[1].barh(lab, val, color=col, hatch=hat, edgecolor='white', lw=.5); ax[1].axvline(base_att, color='k', lw=.8, ls=':')
 for i, (v, r) in enumerate(zip(val, rows[::-1])):
     ax[1].text(max(v, base_att) + 10, i, r'$R_0=%.2f$' % r['R0'], va='center', fontsize=8)
 ax[1].set_xlim(0, max(val) * 1.25); ax[1].set_xlabel('cumulative cases over 5 years per 1,000 residents')
