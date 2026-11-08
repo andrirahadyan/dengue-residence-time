@@ -95,8 +95,19 @@ print('p_sens', json.dumps(cal['p_sensitivity']), flush=True)
 
 # counterfactuals with the calibrated parameters (excess reported cases over the window)
 m1, m2, rep, seeds = unpack(zb)
-def excess(m1_, m2_, p12, p21, theta=0.5):
-    return float((monthly(params(m1_, m2_, p12, p21, theta), seeds, rep) - BG).sum())
+def excess(m1_, m2_, p12, p21, theta=0.5, T=1825):
+    """reported excess cases over the whole epidemic (5 years from November 2023), as in Table 5."""
+    p = params(m1_, m2_, p12, p21, theta); y0 = np.concatenate([dfe(p), [0, 0]])
+    for i in range(2):
+        y0[i] -= seeds[i]; y0[2 + i] += seeds[i] / 2; y0[4 + i] += seeds[i] / 2
+    s = solve_ivp(rhs_c, (0, T), y0, t_eval=[T], method='LSODA', rtol=1e-7, atol=1e-6, args=(p,))
+    return float(rep * s.y[14:16, -1].sum())
+def excess_by(m1_, m2_, p12, p21, theta=0.5, T=1825):
+    p = params(m1_, m2_, p12, p21, theta); y0 = np.concatenate([dfe(p), [0, 0]])
+    for i in range(2):
+        y0[i] -= seeds[i]; y0[2 + i] += seeds[i] / 2; y0[4 + i] += seeds[i] / 2
+    s = solve_ivp(rhs_c, (0, T), y0, t_eval=[T], method='LSODA', rtol=1e-7, atol=1e-6, args=(p,))
+    return (rep * s.y[14:16, -1]).tolist()
 base_exc = excess(m1, m2, P12_0, P21_0)
 dense = 0 if m1 * NH2[0] / NH2[0] >= m2 else 1                 # cluster with more mosquitoes per person
 tot_v = m1 * NH2[0] + m2 * NH2[1]; cut = 0.2 * tot_v
@@ -116,6 +127,12 @@ for w, lab in [('dense', 'Vector control, denser cluster'), ('uniform', 'Vector 
     v = ctrl(w); cf.append((lab, excess(v[0], v[1], P12_0, P21_0), R0(params(v[0], v[1], P12_0, P21_0))))
 cal['dense_cluster'] = ['DKI Jakarta', 'Banten'][dense]
 cal['counterfactuals'] = [dict(name=n, excess=e, change=e / base_exc - 1, R0=r) for n, e, r in cf]
+cal['cut_fraction'] = dict(dense=float(cut / (m1 * NH2[0] if dense == 0 else m2 * NH2[1])),
+                           other=float(cut / (m2 * NH2[1] if dense == 0 else m1 * NH2[0])))
+vv = {'dense': ctrl('dense'), 'uniform': ctrl('uniform'), 'sparse': ctrl('sparse')}
+cal['cf_local_R0'] = {k: R0_local(params(v[0], v[1], P12_0, P21_0)).tolist() for k, v in vv.items()}
+cal['cf_by_cluster'] = {k: excess_by(v[0], v[1], P12_0, P21_0) for k, v in vv.items()}
+cal['cf_by_cluster']['baseline'] = excess_by(m1, m2, P12_0, P21_0)
 print('cf', json.dumps(cal['counterfactuals']), flush=True)
 
 # figure: observed vs fitted
