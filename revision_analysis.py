@@ -111,7 +111,9 @@ def attack(p, T=730):
     It = (y[4] + y[5]) * 1000 / p['Nh'].sum()
     att = [(y[6 + k][-1] + y[4 + k][-1] + y[2 + k][-1]) * 1000 / p['Nh'][k] for k in range(2)]
     tot = (y[2:8, -1].sum()) * 1000 / p['Nh'].sum()
-    return dict(R0=R0(p), attack=float(tot), att1=float(att[0]), att2=float(att[1]),
+    newI = p['beta'] * (y[2] + y[3])                      # new infectious cases per day
+    cum = float(np.sum(np.diff(t) * (newI[1:] + newI[:-1]) / 2) * 1000 / p['Nh'].sum())
+    return dict(R0=R0(p), attack=float(tot), cuminc=cum, att1=float(att[0]), att2=float(att[1]),
                 peak=float(It.max()), tpeak=float(t[It.argmax()]))
 def scen(dense=1.0, sparse=1.0, **kw):
     q = make(ratio=2, rv=2, p12=kw.pop('p12', 0.1), theta=kw.pop('theta', 0.5))
@@ -125,7 +127,7 @@ S = [('Baseline ($p=0.1$, $\\theta=0.5$)', scen()),
      ('Vector control, both clusters ($-20\\%$ each)', scen(dense=0.8, sparse=0.8)),
      ('Vector control, sparse cluster ($-60\\%$ of $N_{v2}$)', scen(sparse=0.4)),
      ('Dense-cluster control and $\\theta=1$', scen(dense=0.7, theta=1.0))]
-rev['interventions'] = [dict(name=n, **attack(q)) for n, q in S]
+rev['interventions'] = [dict(name=n, **attack(q, T=1825)) for n, q in S]   # 5 years: epidemics complete
 # stronger dense-cluster control needed to push R0 < 1
 rev['dense_control_R0eq1'] = 1 - brentq(lambda f: R0(scen(dense=f)) - 1, 0.01, 1.0)
 rev['uniform_control_R0eq1'] = 1 - brentq(lambda f: R0(scen(dense=f, sparse=f)) - 1, 0.01, 1.0)
@@ -146,21 +148,24 @@ rev['sweep_ratio'] = {str(r): [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['at
 
 # Figure 5
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.0), gridspec_kw=dict(width_ratios=[1, 1.15]))
-for th, c, ls in [(0.0, '#c0392b', '-'), (0.5, '#7d3c98', '--'), (1.0, '#2471a3', ':')]:
-    ax[0].plot(pg, rev['sweep'][str(th)]['attack'], color=c, ls=ls, lw=2, label=r'$\theta=%g$' % th)
+rev['sweep_ratio_curve'] = {}
+for r, c, ls in [(1.0, '#444444', '-'), (1.5, '#2471a3', '--'), (2.0, '#c0392b', '-'), (5.0, '#7d3c98', ':')]:
+    a_ = [attack(make(ratio=2, rv=r, p12=x, theta=0.5))['attack'] for x in pg]
+    rev['sweep_ratio_curve'][str(r)] = a_
+    ax[0].plot(pg, a_, color=c, ls=ls, lw=2, label='mosquitoes %g:1' % r)
 ax[0].set_xlabel(r'$p$ (fraction of time in the other cluster)')
 ax[0].set_ylabel('infected over 730 days per 1,000 residents')
-ax[0].set_title(r'(a) Epidemic size vs $p$ (mosquitoes 2:1, $N_v/N_h=2$)', fontsize=10)
+ax[0].set_title(r'(a) Epidemic size vs $p$ ($N_v/N_h=2$, $\theta=0.5$)', fontsize=10)
 ax[0].legend(frameon=False)
-rows = rev['interventions']; base_att = rows[0]['attack']
+rows = rev['interventions']; base_att = rows[0]['cuminc']
 lab = [r['name'].replace('$-30\\%$ of $N_{v1}$', '$-30\\%$ $N_{v1}$').replace('$-60\\%$ of $N_{v2}$', '$-60\\%$ $N_{v2}$') for r in rows][::-1]
-val = [r['attack'] for r in rows][::-1]
+val = [r['cuminc'] for r in rows][::-1]
 col = ['#7f8c8d' if i == len(rows) - 1 else ('#1e8449' if 'Vector' in rows[::-1][i]['name'] or 'Dense' in rows[::-1][i]['name'] else '#2471a3')
        for i in range(len(rows))]
 ax[1].barh(lab, val, color=col); ax[1].axvline(base_att, color='k', lw=.8, ls=':')
 for i, (v, r) in enumerate(zip(val, rows[::-1])):
-    ax[1].text(v + 8, i, r'$R_0=%.2f$' % r['R0'], va='center', fontsize=8)
-ax[1].set_xlim(0, max(val) * 1.25); ax[1].set_xlabel('infected over 730 days per 1,000 residents')
+    ax[1].text(max(v, base_att) + 10, i, r'$R_0=%.2f$' % r['R0'], va='center', fontsize=8)
+ax[1].set_xlim(0, max(val) * 1.25); ax[1].set_xlabel('cumulative cases over 5 years per 1,000 residents')
 ax[1].set_title('(b) Interventions (same scenario, $p=0.1$)', fontsize=10)
 for a in ax:
     a.xaxis.set_major_formatter(koma); a.spines['top'].set_visible(False); a.spines['right'].set_visible(False)
