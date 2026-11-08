@@ -11,7 +11,7 @@ The scripts implement a deterministic SEIR–SEI dengue model for two clusters c
 - local sensitivity indices, 730-day simulations
 - global sensitivity analysis (Latin hypercube sampling with PRCC, and Sobol indices with SALib)
 - global-stability bound R̂0 for the disease-free equilibrium and numerical checks in the gap R0 < 1 ≤ R̂0
-- uniqueness and local stability of the endemic equilibrium (numerical)
+- existence and uniqueness of the endemic equilibrium (proof checked numerically) and its local stability (numerical)
 - intervention scenarios (mobility restrictions, isolation of infected residents, vector control at equal effort)
 - illustrative calibration to the 2024 dengue outbreak in DKI Jakarta and Banten
 
@@ -21,11 +21,12 @@ The scripts implement a deterministic SEIR–SEI dengue model for two clusters c
 |---|---|---|
 | `model_waktu_tinggal.py` | Figures with Indonesian labels and all results in `hasil_waktu_tinggal.json` | – |
 | `model_waktu_tinggal_en.py` | R0, threshold, sensitivity, and simulations with English labels, saved in `en/` | Tables 3–4, Figures 1–3 and 5 |
-| `revision_analysis.py` | Global-stability bound, endemic equilibrium, interventions; `en/results_revision.json`, `en/gambar5_interventions.png` | Section 3.2 (Theorem and Remark), Table 5, Figure 4 |
+| `revision_analysis.py` | Global-stability bound, endemic equilibrium, interventions; `en/results_revision.json`, `en/gambar5_interventions.png` | Section 3.3 (Theorem 3.3), Remark 1, Table 5, Figure 4 |
+| `endemic_reduction_check.py` | Check that every positive equilibrium of the full model equals the fixed point of the map H (θ = 0); `en/results_endemic_check.json` | Section 3.4 (Propositions 3.4–3.5) |
 | `calibration.py` | Fit to monthly cases, bootstrap, residence-time sensitivity, counterfactuals; `en/results_calibration.json`, `en/gambar6_calibration.png` | Table 6, Figure 6 |
 | `data/opendengue_v1_3_dki_banten_monthly.csv` | Monthly reported dengue cases, DKI Jakarta and Banten, 2022–2024 | Input to `calibration.py` |
 
-`revision_analysis.py` and `calibration.py` reuse the model definitions in `model_waktu_tinggal_en.py`, so keep the three files in the same folder.
+`revision_analysis.py`, `endemic_reduction_check.py`, and `calibration.py` reuse the model definitions in `model_waktu_tinggal_en.py`, so keep these files in the same folder.
 
 ## Data sources
 
@@ -39,6 +40,7 @@ The scripts implement a deterministic SEIR–SEI dengue model for two clusters c
 pip install -r requirements.txt
 python model_waktu_tinggal_en.py
 python revision_analysis.py
+python endemic_reduction_check.py
 python calibration.py
 ```
 
