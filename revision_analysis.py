@@ -71,7 +71,7 @@ import time; _t=time.time(); print('A done', flush=True)
 # ------------------------------------------------------------------ B. endemic equilibrium
 def find_ee(p, rng, n_guess=8):
     """roots of the right-hand side from random interior guesses (scaled by total populations)."""
-    sc = np.concatenate([np.repeat(p['Nh'], 4), np.repeat(p['Nv'], 3)])
+    sc = np.concatenate([np.tile(p['Nh'], 4), np.tile(p['Nv'], 3)])
     f = lambda z: rhs(0, z * sc, p) / sc
     sols = []
     for _ in range(n_guess):
