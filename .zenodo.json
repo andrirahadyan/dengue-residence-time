@@ -1,0 +1,15 @@
+{
+  "title": "Code and data for \"Daily Mobility Can Lower the Dengue Reproduction Number yet Increase Infections: A Two-Cluster Residence-Time Model with an Application to Jakarta and Banten\"",
+  "upload_type": "software",
+  "description": "Code and data for the article <i>Daily Mobility Can Lower the Dengue Reproduction Number yet Increase Infections: A Two-Cluster Residence-Time Model with an Application to Jakarta and Banten</i> (Rahadyan, Sabran, Muhtar, Rianjaya, Wulandari). The Python scripts implement a two-cluster SEIR-SEI dengue model with residence times and reproduce every number, table, and figure in the article, including the calibration to monthly reported cases in DKI Jakarta and Banten (OpenDengue V1.3) with residence fractions from the 2023 Jabodetabek Commuter Survey.",
+  "creators": [
+    {"name": "Rahadyan, Andri", "affiliation": "Universitas Indraprasta PGRI"},
+    {"name": "Sabran, La Ode", "affiliation": "Universitas Islam Negeri Imam Bonjol Padang"},
+    {"name": "Muhtar, Norma", "affiliation": "Universitas Halu Oleo"},
+    {"name": "Rianjaya, Ilham Dangu", "affiliation": "Universitas Islam Negeri Imam Bonjol Padang"},
+    {"name": "Wulandari, Septian", "affiliation": "Universitas Indraprasta PGRI"}
+  ],
+  "keywords": ["dengue", "residence time", "human mobility", "basic reproduction number", "vector control"],
+  "license": "MIT",
+  "access_right": "open"
+}
